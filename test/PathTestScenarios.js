@@ -1,5 +1,6 @@
 module.exports = [
     {
+        name: "maze 1",
         startX: 0,
         startY: 0,
         endX: 1,
@@ -9,6 +10,7 @@ module.exports = [
         expectedLength: 3,
     },
     {
+        name: "maze 2",
         startX: 1,
         startY: 1,
         endX: 4,
@@ -22,6 +24,7 @@ module.exports = [
         expectedLength: 9,
     },
     {
+        name: "maze 3",
         startX: 0,
         startY: 3,
         endX: 3,
@@ -35,6 +38,7 @@ module.exports = [
         expectedLength: 10,
     },
     {
+        name: "maze 4",
         startX: 4,
         startY: 4,
         endX: 19,
@@ -61,4 +65,45 @@ module.exports = [
                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
         expectedLength: 31,
     },
+    {
+        //This maze is identical to maze 1 but descibed using walls instead of blocked tiles
+        name: "wall maze 1",
+        startX: 1,
+        startY: 1,
+        endX: 4,
+        endY: 4,
+        matrix: [[0     , 0     , 0     , 0     , 0],
+                 ["nesw", 0     , "nesw", "nesw", 0],
+                 ["nesw", 0     , "nesw", 0     , 0],
+                 [0     , "nesw", 0     , 0     , 0],
+                 ["nesw", 0     , "nesw", "nesw", 0],
+                 [0     , 0     , "nesw", 0     , 0]],
+        expectedLength: 9,
+    }
+    ,
+    {
+        name: "wall maze 2",
+        startX: 0,
+        startY: 0,
+        endX: 2,
+        endY: 2,
+        matrix: [["", ""  , "" , ""  , ""],
+                 ["", "nw", "n", "ne", ""],
+                 ["", "w" , "" , "e" , ""],
+                 ["", "w" , "" , "e" , ""],
+                 ["", "w" , "" , "e" , ""],
+                 ["", ""  , "" , ""  , ""]],
+        expectedLength: 11,
+    }
+    ,
+    {
+        name: "wall maze 3",
+        startX: 0,
+        startY: 0,
+        endX: 1,
+        endY: 0,
+        matrix: [["", "w"],
+                 ["", ""]],
+        expectedLength: 4,
+    }
 ];

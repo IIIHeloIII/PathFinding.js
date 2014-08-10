@@ -36,14 +36,14 @@ function Grid(width, height, matrix) {
  * @see Grid
  */
 Grid.prototype._buildNodes = function(width, height, matrix) {
-    var i, j,
+    var y, x,
         nodes = new Array(height),
         row;
 
-    for (i = 0; i < height; ++i) {
-        nodes[i] = new Array(width);
-        for (j = 0; j < width; ++j) {
-            nodes[i][j] = new Node(j, i);
+    for (y = 0; y < height; ++y) {
+        nodes[y] = new Array(width);
+        for (x = 0; x < width; ++x) {
+            nodes[y][x] = new Node(x, y);
         }
     }
 
@@ -56,12 +56,28 @@ Grid.prototype._buildNodes = function(width, height, matrix) {
         throw new Error('Matrix size does not fit');
     }
 
-    for (i = 0; i < height; ++i) {
-        for (j = 0; j < width; ++j) {
-            if (matrix[i][j]) {
+    for (y = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x) {
+            var encoding = matrix[y][x];
+            if (encoding) {
                 // 0, false, null will be walkable
                 // while others will be un-walkable
-                nodes[i][j].walkable = false;
+                nodes[y][x].walkable = false;
+            }
+            if (typeof encoding == 'string' || encoding instanceof String){
+                nodes[y][x].walkable = true;
+                if(encoding.indexOf("n") > -1){
+                  nodes[y][x].north = false;
+                }
+                if(encoding.indexOf("e") > -1){
+                  nodes[y][x].east = false;
+                }
+                if(encoding.indexOf("s") > -1){
+                  nodes[y][x].south = false;
+                }
+                if(encoding.indexOf("w") > -1){
+                  nodes[y][x].west = false;
+                }
             }
         }
     }
@@ -84,6 +100,38 @@ Grid.prototype.getNodeAt = function(x, y) {
  */
 Grid.prototype.isWalkableAt = function(x, y) {
     return this.isInside(x, y) && this.nodes[y][x].walkable;
+};
+
+Grid.prototype.nodeHasNoWallInDir = function(node, dir) {
+    var x = node.x;
+    var y = node.y;
+    if(dir == "north" && this.isWalkableAt(node.x, node.y - 1)){
+        return node.north && this.nodes[y-1][x].south;
+    }
+    if(dir == "east" && this.isWalkableAt(node.x + 1, node.y)){
+        return node.east && this.nodes[y][x+1].west;
+    }
+    if(dir == "south" && this.isWalkableAt(node.x, node.y + 1)){
+        return node.south && this.nodes[y+1][x].north;
+    }
+    if(dir == "west" && this.isWalkableAt(node.x - 1, node.y)){
+        return node.west && this.nodes[y][x-1].east;
+    }
+
+    return false; //neighbor is not walkable
+};
+
+Grid.prototype.pathClearDiagonal = function(startnode, endnode) {
+    var dirUD = endnode.y-startnode.y == 1 ? "south" : "north";
+    var dirLR = endnode.x-startnode.x == 1 ? "east" : "west";
+    var oppositeDirUD = endnode.y-startnode.y == -1 ? "south" : "north";
+    var oppositeDirLR = endnode.x-startnode.x == -1 ? "east" : "west";
+
+    debugger;
+    return  (startnode[dirUD] || endnode[oppositeDirUD])&&
+            (startnode[dirLR] || endnode[oppositeDirLR])&&
+            (startnode[dirUD] || startnode[dirLR]) &&
+            (endnode[oppositeDirUD] || endnode[oppositeDirLR]);
 };
 
 
@@ -143,22 +191,22 @@ Grid.prototype.getNeighbors = function(node, allowDiagonal, dontCrossCorners) {
         nodes = this.nodes;
 
     // ↑
-    if (this.isWalkableAt(x, y - 1)) {
+    if (this.isWalkableAt(x, y - 1) && this.nodeHasNoWallInDir(node, "north")) {
         neighbors.push(nodes[y - 1][x]);
         s0 = true;
     }
     // →
-    if (this.isWalkableAt(x + 1, y)) {
+    if (this.isWalkableAt(x + 1, y) && this.nodeHasNoWallInDir(node, "east")) {
         neighbors.push(nodes[y][x + 1]);
         s1 = true;
     }
     // ↓
-    if (this.isWalkableAt(x, y + 1)) {
+    if (this.isWalkableAt(x, y + 1) && this.nodeHasNoWallInDir(node, "south")) {
         neighbors.push(nodes[y + 1][x]);
         s2 = true;
     }
     // ←
-    if (this.isWalkableAt(x - 1, y)) {
+    if (this.isWalkableAt(x - 1, y) && this.nodeHasNoWallInDir(node, "west")) {
         neighbors.push(nodes[y][x - 1]);
         s3 = true;
     }
@@ -180,19 +228,19 @@ Grid.prototype.getNeighbors = function(node, allowDiagonal, dontCrossCorners) {
     }
 
     // ↖
-    if (d0 && this.isWalkableAt(x - 1, y - 1)) {
+    if (d0 && this.isWalkableAt(x - 1, y - 1) && this.pathClearDiagonal(node, nodes[y - 1][x - 1])) {
         neighbors.push(nodes[y - 1][x - 1]);
     }
     // ↗
-    if (d1 && this.isWalkableAt(x + 1, y - 1)) {
+    if (d1 && this.isWalkableAt(x + 1, y - 1) && this.pathClearDiagonal(node, nodes[y - 1][x + 1])) {
         neighbors.push(nodes[y - 1][x + 1]);
     }
     // ↘
-    if (d2 && this.isWalkableAt(x + 1, y + 1)) {
+    if (d2 && this.isWalkableAt(x + 1, y + 1) && this.pathClearDiagonal(node, nodes[y + 1][x + 1])) {
         neighbors.push(nodes[y + 1][x + 1]);
     }
     // ↙
-    if (d3 && this.isWalkableAt(x - 1, y + 1)) {
+    if (d3 && this.isWalkableAt(x - 1, y + 1) && this.pathClearDiagonal(node, nodes[y + 1][x - 1])) {
         neighbors.push(nodes[y + 1][x - 1]);
     }
 
@@ -218,7 +266,11 @@ Grid.prototype.clone = function() {
     for (i = 0; i < height; ++i) {
         newNodes[i] = new Array(width);
         for (j = 0; j < width; ++j) {
-            newNodes[i][j] = new Node(j, i, thisNodes[i][j].walkable);
+            newNodes[i][j] = new Node(j, i,   thisNodes[i][j].walkable,
+                                                thisNodes[i][j].n,
+                                                thisNodes[i][j].e,
+                                                thisNodes[i][j].s,
+                                                thisNodes[i][j].w);
         }
     }
 

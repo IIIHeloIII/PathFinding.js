@@ -2,7 +2,7 @@ var Grid = require('..').Grid;
 
 describe('Grid', function() {
     describe('generate without matrix', function() {
-        var width, height, grid;
+        var width, height, grid, wallgrid;
 
         beforeEach(function() {
             width = 10;
@@ -16,7 +16,7 @@ describe('Grid', function() {
 
             grid.nodes.length.should.equal(height);
             for (var i = 0; i < height; ++i) {
-                grid.nodes[i].length.should.equal(width); 
+                grid.nodes[i].length.should.equal(width);
             }
         });
 
@@ -30,7 +30,7 @@ describe('Grid', function() {
     });
 
     describe('generate with matrix', function() {
-        var matrix, grid, width, height;
+        var matrix, wallmatrix, grid, wallgrid, width, height;
 
         var enumPos = function(f, o) {
             for (var y = 0; y < height; ++y) {
@@ -52,9 +52,17 @@ describe('Grid', function() {
                 [0, 0, 0, 0],
                 [1, 0, 0, 1],
             ];
+            wallmatrix = [
+                ["nesw", 0   , 0, "nesw"],
+                [0  , "nesw", 0, 0],
+                [0  , "nesw" , 0, 0],
+                [0  , 0   , 0, 0],
+                ["nesw", 0   , 0, "nesw"],
+            ];
             height = matrix.length;
             width = matrix[0].length;
             grid = new Grid(width, height, matrix);
+            wallgrid = new Grid(width, height, wallmatrix);
         });
 
         it('should have correct size', function() {
@@ -63,7 +71,7 @@ describe('Grid', function() {
 
             grid.nodes.length.should.equal(height);
             for (var i = 0; i < height; ++i) {
-                grid.nodes[i].length.should.equal(width); 
+                grid.nodes[i].length.should.equal(width);
             }
         });
 
@@ -79,13 +87,13 @@ describe('Grid', function() {
 
         it('should be able to set nodes\' walkable attribute', function() {
             enumPos(function(x, y) {
-                grid.setWalkableAt(x, y, false); 
+                grid.setWalkableAt(x, y, false);
             });
             enumPos(function(x, y) {
                 grid.isWalkableAt(x, y).should.be.false;
             })
             enumPos(function(x, y) {
-                grid.setWalkableAt(x, y, true); 
+                grid.setWalkableAt(x, y, true);
             });
             enumPos(function(x, y) {
                 grid.isWalkableAt(x, y).should.be.true;
@@ -105,19 +113,29 @@ describe('Grid', function() {
                 [width, 0, false],
                 [width, height, false],
             ];
-            
+
             asserts.forEach(function(v, i, a) {
                 grid.isInside(v[0], v[1]).should.equal(v[2]);
             });
         });
 
-        it('should return correct neighbors', function() {
+        it('should return correct neighbors for simple maze', function() {
             grid.getNeighbors(grid.nodes[1][0]).should.eql([ grid.nodes[2][0] ]);
             var cmp = function(a, b) {
                 return a.x * 100 + a.y - b.x * 100 - b.y;
             };
             grid.getNeighbors(grid.nodes[0][2], true).sort(cmp).should.eql([
                 grid.nodes[0][1], grid.nodes[1][2], grid.nodes[1][3]
+            ].sort(cmp))
+        });
+
+        it('should return correct neighbors for wall maze', function() {
+            wallgrid.getNeighbors(wallgrid.nodes[1][0]).should.eql([ wallgrid.nodes[2][0] ]);
+            var cmp = function(a, b) {
+                return a.x * 100 + a.y - b.x * 100 - b.y;
+            };
+            wallgrid.getNeighbors(wallgrid.nodes[0][2], true).sort(cmp).should.eql([
+                wallgrid.nodes[0][1], wallgrid.nodes[1][2], wallgrid.nodes[1][3]
             ].sort(cmp))
         });
     });

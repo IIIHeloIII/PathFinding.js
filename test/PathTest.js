@@ -15,10 +15,8 @@ function pathTest(opt) {
             width, height, matrix, path, i, scen;
 
         var test = (function() {
-            var testId = 0;
-
-            return function(startX, startY, endX, endY, grid, expectedLength) {
-                it('should solve maze '+ ++testId, function() {
+            return function(name, startX, startY, endX, endY, grid, expectedLength) {
+                it('should solve ' + name, function() {
                     path = finder.findPath(startX, startY, endX, endY, grid);
                     if (optimal) {
                         path.length.should.equal(expectedLength);
@@ -41,9 +39,10 @@ function pathTest(opt) {
             grid = new PF.Grid(width, height, matrix);
 
             test(
-                scen.startX, scen.startY, 
-                scen.endX, scen.endY, 
-                grid, 
+                scen.name,
+                scen.startX, scen.startY,
+                scen.endX, scen.endY,
+                grid,
                 scen.expectedLength
             );
         }
@@ -97,12 +96,12 @@ pathTests({
     name: 'IDAStar',
     finder: new PF.IDAStarFinder(),
     optimal: false
-}, {
-    name: 'JumpPoint',
-    finder: new PF.JumpPointFinder(),
-    optimal: false
-},  {
-    name: 'OrthogonalJumpPoint',
-    finder: new PF.OrthogonalJumpPointFinder(),
-    optimal: false
+//}, {
+//    name: 'JumpPoint',
+//    finder: new PF.JumpPointFinder(),
+//    optimal: false
+//},  {
+//    name: 'OrthogonalJumpPoint',
+//    finder: new PF.OrthogonalJumpPointFinder(),
+//    optimal: false
 });

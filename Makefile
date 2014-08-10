@@ -14,6 +14,14 @@ test:
 			--reporter $(TEST_REPORTER) \
 			--bail
 
+testdebug:
+	@NODE_ENV=test \
+		node-debug -p 8081 ./node_modules/.bin/_mocha \
+			--require should \
+			--timeout $(TEST_TIMEOUT) \
+			--reporter $(TEST_REPORTER) \
+			--bail
+
 clean:
 	rm -f lib/pathfinding-browser.js
 
