@@ -1,6 +1,7 @@
 var Util       = require('../core/Util');
 var Heuristic  = require('../core/Heuristic');
 var Node       = require('../core/Node');
+var WallNode   = require('../core/WallNode');
 
 /**
  * Iterative Deeping A Star (IDA*) path-finder.
@@ -118,7 +119,7 @@ IDAStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
 
             t = search(neighbour, g + cost(node, neighbour), cutoff, route, depth + 1);
 
-            if(t instanceof Node) {
+            if(t instanceof Node || t instanceof WallNode) {
                 route[depth] = [node.x, node.y];
 
                 // For a typical A* linked list, this would work:
@@ -166,7 +167,7 @@ IDAStarFinder.prototype.findPath = function(startX, startY, endX, endY, grid) {
 
         // If t is a node, it's also the end node. Route is now
         // populated with a valid path to the end node.
-        if(t instanceof Node) {
+        if(t instanceof Node || t instanceof WallNode) {
             //console.log("Finished at iteration: " + j + ", search cut-off value: " + cutOff + ", nodes visited: " + nodesVisited + ".");
             return route;
         }

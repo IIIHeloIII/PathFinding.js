@@ -36,7 +36,10 @@ function pathTest(opt) {
             height = matrix.length;
             width = matrix[0].length;
 
-            grid = new PF.Grid(width, height, matrix);
+            if(typeof matrix[0][0] === "string")
+                grid = new PF.WallGrid(width, height, matrix);
+            else
+                grid = new PF.Grid(width, height, matrix);
 
             test(
                 scen.name,

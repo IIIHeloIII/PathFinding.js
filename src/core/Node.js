@@ -6,12 +6,8 @@
  * @param {number} x - The x coordinate of the node on the grid.
  * @param {number} y - The y coordinate of the node on the grid.
  * @param {boolean} [walkable] - Whether this node is walkable.
- * @param {boolean} [n] - Whether this node is clear to the north.
- * @param {boolean} [e] - Whether this node is clear to the east.
- * @param {boolean} [s] - Whether this node is clear to the south.
- * @param {boolean} [w] - Whether this node is clear to the west.
  */
-function Node(x, y, walkable,n,e,s,w) {
+function Node(x, y, walkable) {
     /**
      * The x coordinate of the node on the grid.
      * @type number
@@ -27,10 +23,6 @@ function Node(x, y, walkable,n,e,s,w) {
      * @type boolean
      */
     this.walkable = (walkable === undefined ? true : walkable);
-    this.north = (n === undefined ? true : n);
-    this.east = (e === undefined ? true : e);
-    this.south = (s === undefined ? true : s);
-    this.west = (w === undefined ? true : w);
 };
 
 module.exports = Node;
