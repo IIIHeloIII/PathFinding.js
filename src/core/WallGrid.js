@@ -205,7 +205,7 @@ WallGrid.prototype.clone = function() {
         row;
 
     for (y = 0; y < height; ++y) {
-        newNodes[i] = new Array(width);
+        newNodes[y] = new Array(width);
         for (x = 0; x < width; ++x) {
             newNodes[y][x] = new WallNode(x, y, thisNodes[y][x].n,
                                                 thisNodes[y][x].e,
